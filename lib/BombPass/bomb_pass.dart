@@ -68,7 +68,7 @@ class PlayerComponent extends PositionComponent with HasGameRef<MyGame> {
     // Draw body (circle)
     canvas.drawCircle(Offset(radius, radius), radius, paintBody);
     // Draw name above
-    TextPaint(style: TextStyle(color: Colors.white, fontSize: 12)).render(canvas, name, Vector2(0, -12));
+    TextPaint(style: const TextStyle(color: Colors.white, fontSize: 12)).render(canvas, name, Vector2(0, -12));
     // draw health bar
     final barW = 36.0;
     final hX = (size.x - barW) / 2;
@@ -155,9 +155,9 @@ class MyGame extends FlameGame with /*HasDraggables, HasTappables,*/ HasKeyboard
   Future<void> onLoad() async {
     worldSize = Vector2(1600, 900);
     // initial obstacles
-    obstacles.add(Obstacle(Rect.fromLTWH(300, 200, 200, 40)));
-    obstacles.add(Obstacle(Rect.fromLTWH(800, 400, 60, 260)));
-    obstacles.add(Obstacle(Rect.fromLTWH(1200, 100, 220, 120)));
+    obstacles.add(Obstacle(const Rect.fromLTWH(300, 200, 200, 40)));
+    obstacles.add(Obstacle(const Rect.fromLTWH(800, 400, 60, 260)));
+    obstacles.add(Obstacle(const Rect.fromLTWH(1200, 100, 220, 120)));
 
     // create local player placeholder (will be replaced by network init)
     // network will call addPlayer when players join
@@ -330,7 +330,7 @@ class NetworkManager {
   // Client connect to host
   Future<bool> connectToHost(String hostIp, MyGame g) async {
     try {
-      clientSocket = await Socket.connect(hostIp, SERVER_PORT, timeout: Duration(seconds: 6));
+      clientSocket = await Socket.connect(hostIp, SERVER_PORT, timeout: const Duration(seconds: 6));
       game = g;
       clientSocket!.listen((data) {
         final msg = NetMsg.decode(utf8.decode(data));
@@ -393,7 +393,7 @@ class NetworkManager {
 class GameScreen extends StatefulWidget {
   final bool isHost;
   final String? hostIp;
-  GameScreen({required this.isHost, this.hostIp});
+  GameScreen({super.key, required this.isHost, this.hostIp});
 
   @override
   _GameScreenState createState() => _GameScreenState();
@@ -473,11 +473,11 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.isHost ? 'Host Game' : 'Client Game'), actions: [Center(child: Text(status)), SizedBox(width: 12)]),
+      appBar: AppBar(title: Text(widget.isHost ? 'Host Game' : 'Client Game'), actions: [Center(child: Text(status)), const SizedBox(width: 12)]),
       body: Stack(children: [
         GameWidget(game: game),
         Positioned(bottom: 20, left: 20, child: JoystickWidget(onChange: onJoystickChange)),
-        Positioned(bottom: 24, right: 24, child: ElevatedButton(onPressed: onShoot, child: Icon(Icons.radio_button_checked))),
+        Positioned(bottom: 24, right: 24, child: ElevatedButton(onPressed: onShoot, child: const Icon(Icons.radio_button_checked))),
       ]),
     );
   }
@@ -486,7 +486,7 @@ class _GameScreenState extends State<GameScreen> {
 // Simple Joystick Widget (native Flutter) to send -1..1 offsets
 class JoystickWidget extends StatefulWidget {
   final void Function(Offset) onChange;
-  JoystickWidget({required this.onChange});
+  JoystickWidget({super.key, required this.onChange});
   @override
   _JoystickWidgetState createState() => _JoystickWidgetState();
 }
@@ -518,8 +518,8 @@ class _JoystickWidgetState extends State<JoystickWidget> {
         width: radius * 2,
         height: radius * 2,
         child: Stack(children: [
-          Positioned(left: 0, top: 0, child: Container(width: radius * 2, height: radius * 2, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white24))),
-          Positioned(left: radius + knobPos.dx - 20, top: radius + knobPos.dy - 20, child: Container(width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white)) ),
+          Positioned(left: 0, top: 0, child: Container(width: radius * 2, height: radius * 2, decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white24))),
+          Positioned(left: radius + knobPos.dx - 20, top: radius + knobPos.dy - 20, child: Container(width: 40, height: 40, decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white)) ),
         ]),
       ),
     );
@@ -528,6 +528,8 @@ class _JoystickWidgetState extends State<JoystickWidget> {
 
 // -------------------- APP ENTRY / LOBBY --------------------
 class LobbyScreen extends StatefulWidget {
+  const LobbyScreen({super.key});
+
   @override
   _LobbyScreenState createState() => _LobbyScreenState();
 }
@@ -539,22 +541,22 @@ class _LobbyScreenState extends State<LobbyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Bomb Pass - Realistic Demo')),
+      appBar: AppBar(title: const Text('Bomb Pass - Realistic Demo')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(children: [
-          SizedBox(height: 12),
-          ElevatedButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => GameScreen(isHost: true))), child: Text('Start as Host (create hotspot manually)')),
-          SizedBox(height: 12),
-          TextField(controller: hostIpController, decoration: InputDecoration(labelText: 'Host IP (e.g. 192.168.43.1)')),
-          SizedBox(height: 8),
+          const SizedBox(height: 12),
+          ElevatedButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => GameScreen(isHost: true))), child: const Text('Start as Host (create hotspot manually)')),
+          const SizedBox(height: 12),
+          TextField(controller: hostIpController, decoration: const InputDecoration(labelText: 'Host IP (e.g. 192.168.43.1)')),
+          const SizedBox(height: 8),
           ElevatedButton(onPressed: () {
             final ip = hostIpController.text.trim();
             if (ip.isEmpty) return;
             Navigator.push(context, MaterialPageRoute(builder: (_) => GameScreen(isHost: false, hostIp: ip)));
-          }, child: Text('Join as Client')),
-          SizedBox(height: 24),
-          Text('Notes: Host must create a hotspot or both devices must be on same Wi‑Fi. Client must enter host IP.'),
+          }, child: const Text('Join as Client')),
+          const SizedBox(height: 24),
+          const Text('Notes: Host must create a hotspot or both devices must be on same Wi‑Fi. Client must enter host IP.'),
         ]),
       ),
     );
@@ -562,7 +564,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
 }
 
 void main() {
-  runApp(MaterialApp(home: LobbyScreen()));
+  runApp(const MaterialApp(home: LobbyScreen()));
 }
 
 // ---------------------------------------------------------------

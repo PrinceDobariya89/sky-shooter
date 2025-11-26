@@ -55,12 +55,8 @@ class _MyHomePageState extends State<MyHomePage> {
         'title': 'Sky Shooter'
       },
       {
-        'action': GameWidget(
-            game: MyGame(isHost: true, network: NetworkManager()),
-            loadingBuilder: (p0) {
-              return const Center(child: CircularProgressIndicator());
-            }),
-        'title': 'Boom Pass'
+        'action': LobbyScreen(),
+        'title': 'Bomb Pass'
       },
     ];
     return Scaffold(
